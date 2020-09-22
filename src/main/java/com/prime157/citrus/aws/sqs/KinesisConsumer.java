@@ -9,7 +9,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,6 @@ public class KinesisConsumer implements Consumer {
         this.streamName = streamName;
         this.kinesis = kinesis;
         this.endpointConfiguration = endpointConfiguration;
-        connectIfNecessary();
     }
 
     @Override
@@ -58,7 +56,7 @@ public class KinesisConsumer implements Consumer {
         final long started = System.currentTimeMillis();
         while (messages.isEmpty()) {
             pollMessages();
-            final long duration = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - started);
+            final long duration = System.currentTimeMillis() - started;
             if (duration > endpointConfiguration.getTimeout()) {
                 LOGGER.warn("Failed to receive message on time");
                 break;
@@ -84,8 +82,8 @@ public class KinesisConsumer implements Consumer {
 
     private void addRecord(final String shardId, final Record record) {
         final String payload = record.data().asUtf8String();
-        LOGGER.info("Received message from shard [{}] with sequence number [{}] and partitionKey [{}]. Payload: {}",
-                shardId, record.sequenceNumber(), record.partitionKey(), payload);
+        LOGGER.info("Received message: stream=[{}], shard=[{}], sequenceNumber=[{}], partitionKey=[{}], payload=[{}]",
+                streamName, shardId, record.sequenceNumber(), record.partitionKey(), payload);
         final Map<String, Object> headers = new HashMap<>();
         headers.put(HEADER_PARTITION_KEY, record.partitionKey());
         headers.put(HEADER_SEQUENCE_NUMBER, record.sequenceNumber());
@@ -137,4 +135,8 @@ public class KinesisConsumer implements Consumer {
         messages.clear();
     }
 
+    public void init() {
+        LOGGER.info("Initializing");
+        connectIfNecessary();
+    }
 }

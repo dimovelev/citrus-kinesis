@@ -7,7 +7,10 @@ You might need to disable CBOR for usage with localstack. Programmatically, you 
 ```java
 System.setProperty(CBOR_ENABLED.property(), "false");
 ```
-    
+   
+# Usage
+Check out the test `KinesisTest` and the configuration in `CitrusConfiguration`.
+ 
 # Releasing
 * Release the project using `mvn release:prepare`, `mvn release:perform`
 * Switch to the released tag using git checkout v[version]

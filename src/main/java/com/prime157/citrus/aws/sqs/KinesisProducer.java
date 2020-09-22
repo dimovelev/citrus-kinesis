@@ -53,12 +53,12 @@ public class KinesisProducer implements Producer {
         requestBuilder.data(SdkBytes.fromUtf8String(payload));
 
         LOGGER.info(
-                "Producing message to stream [{}] with partitionKey=[{}], sequenceNumberForOrdering=[{}], explicitHashKey=[{}] and payload [{}]",
+                "Sending message: stream=[{}], partitionKey=[{}], sequenceNumberForOrdering=[{}], explicitHashKey=[{}], payload=[{}]",
                 streamName, partitionKeyHeader, sequenceNumberHeader, hashKeyHeader, payload);
         final PutRecordRequest req = requestBuilder.build();
         final PutRecordResponse response = kinesis.putRecord(req);
-        LOGGER.info("Successfully sent record to kinesis stream [{}] to shard [{}] with sequenceNumber [{}]",
-                streamName, response.shardId(), response.sequenceNumber());
+        LOGGER.info("Sending message: stream=[{}], shardId=[{}], sequenceNumber=[{}], payload=[{}]", streamName,
+                response.shardId(), response.sequenceNumber(), payload);
         context.setVariable(CONTEXT_SHARD_ID, response.shardId());
         context.setVariable(CONTEXT_SEQUENCE_NUMBER, response.sequenceNumber());
     }

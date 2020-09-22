@@ -1,7 +1,6 @@
 package com.prime157.citrus.aws.sqs;
 
 import com.consol.citrus.endpoint.AbstractEndpoint;
-import com.consol.citrus.endpoint.EndpointConfiguration;
 import com.consol.citrus.messaging.Consumer;
 import com.consol.citrus.messaging.Producer;
 
@@ -25,12 +24,17 @@ public class KinesisEndpoint extends AbstractEndpoint {
 
     private final String streamName;
     private final KinesisClient kinesis;
+    private final KinesisConsumer kinesisConsumer;
 
-    public KinesisEndpoint(final EndpointConfiguration endpointConfiguration, final String streamName,
+    public KinesisEndpoint(final KinesisEndpointConfiguration endpointConfiguration, final String streamName,
             final KinesisClient kinesis) {
         super(endpointConfiguration);
         this.streamName = streamName;
         this.kinesis = kinesis;
+        kinesisConsumer = new KinesisConsumer(streamName, kinesis, getEndpointConfiguration());
+        if (endpointConfiguration.isAutostart()) {
+            kinesisConsumer.init();
+        }
     }
 
     @Override
@@ -40,6 +44,6 @@ public class KinesisEndpoint extends AbstractEndpoint {
 
     @Override
     public Consumer createConsumer() {
-        return new KinesisConsumer(streamName, kinesis, getEndpointConfiguration());
+        return kinesisConsumer;
     }
 }
