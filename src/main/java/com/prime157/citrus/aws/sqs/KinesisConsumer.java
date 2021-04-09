@@ -57,7 +57,7 @@ public class KinesisConsumer implements Consumer {
         while (messages.isEmpty()) {
             pollMessages();
             final long duration = System.currentTimeMillis() - started;
-            if (duration > endpointConfiguration.getTimeout()) {
+            if (duration > timeout) {
                 LOGGER.warn("Failed to receive message on time");
                 break;
             }
